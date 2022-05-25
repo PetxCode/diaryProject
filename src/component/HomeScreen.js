@@ -3,9 +3,11 @@ import styled from "styled-components";
 import { AiTwotoneDelete } from "react-icons/ai";
 import pix from "./gg.jpg";
 import axios from "axios";
+import { useSelector } from "react-redux";
 
 const HomeScreen = () => {
 	const [getData, setGetData] = useState([]);
+	const user = useSelector((state) => state.currentUser);
 
 	const onGetData = async () => {
 		try {
@@ -23,7 +25,7 @@ const HomeScreen = () => {
 
 	useEffect(() => {
 		onGetData();
-	}, [getData]);
+	}, []);
 
 	return (
 		<Container>
@@ -31,19 +33,23 @@ const HomeScreen = () => {
 				{getData &&
 					getData?.map((props) => (
 						<div>
-							{props.diary.map((props) => (
-								<Card key={props._id}>
-									<Image src={props.image} />
+							{/* {user._id === props._id ? ( */}
+							<div key={props._id}>
+								{props.diary.map((props) => (
+									<Card key={props._id}>
+										<Image src={props.image} />
 
-									<TextHolder>
-										<Holder>
-											<Title>{props.title}</Title>
-											<Icon />
-										</Holder>
-										<Message>Message</Message>
-									</TextHolder>
-								</Card>
-							))}
+										<TextHolder>
+											<Holder>
+												<Title>{props.title}</Title>
+												<Icon />
+											</Holder>
+											<Message>{props.message}</Message>
+										</TextHolder>
+									</Card>
+								))}
+							</div>
+							{/* ) : null} */}
 						</div>
 					))}
 			</Wrapper>
@@ -91,7 +97,7 @@ const Image = styled.img`
 const Card = styled.div`
 	margin: 10px;
 	width: 300px;
-	height: 320px;
+	min-height: 320px;
 	box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
 	border-radius: 10px 10px 0 0;
 	overflow: hidden;

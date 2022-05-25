@@ -1,28 +1,103 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import styled from "styled-components";
 
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useForm } from "react-hook-form";
+import axios from "axios";
+import pix from "./gg.jpg";
+import { useSelector } from "react-redux";
+
 const CreateMemories = () => {
+	const user = useSelector((state) => state.currentUser);
+	const id = user._id;
+
+	const navigate = useNavigate();
+	const [image, setImage] = useState(pix);
+	const [avatar, setAvatar] = useState("");
+
+	const formSchema = yup.object().shape({
+		title: yup.string().required("This field cannot be empty"),
+		message: yup.string().required("This field cannot be empty"),
+	});
+
+	const {
+		register,
+		reset,
+		handleSubmit,
+		formState: { errors },
+	} = useForm({
+		resolver: yupResolver(formSchema),
+	});
+
+	const handleImage = (e) => {
+		const file = e.target.files[0];
+		const save = URL.createObjectURL(file);
+		setImage(save);
+		setAvatar(file);
+	};
+
+	const onSubmit = handleSubmit(async (value) => {
+		console.log(value);
+		const { message, title } = value;
+		const path = "http://localhost:2331";
+		const url = `${path}/api/diary/${id}`;
+
+		const formData = new FormData();
+		formData.append("title", title);
+		formData.append("message", message);
+		formData.append("memory", avatar);
+
+		const config = {
+			"content-type": "multipart/form-data",
+			onUploadProgress: (ProgressEvent) => {
+				const { loaded, total } = ProgressEvent;
+				const percent = Math.floor((loaded * 100) / total);
+				console.log(percent);
+			},
+		};
+
+		const options = {
+			onUploadProgress: (ProgressEvent) => {
+				const { loaded, total } = ProgressEvent;
+				const percent = Math.floor((loaded * 100) / total);
+				console.log(percent);
+			},
+		};
+
+		await axios.post(url, formData, config).then((res) => {
+			console.log("Error Data: ", res);
+		});
+
+		navigate("/");
+	});
+
 	return (
 		<Container>
 			<Wrapper>
 				<Card>
 					<ImageHolder>
-						<Image />
-						<ImageLabel>Upload your Image</ImageLabel>
-						<ImageInput />
+						<Image src={image} />
+						<ImageLabel htmlFor="pix">Upload your Image</ImageLabel>
+						<ImageInput
+							id="pix"
+							onChange={handleImage}
+							type="file"
+							accept="image/*"
+						/>
 					</ImageHolder>
 
-					<Form>
+					<Form onSubmit={onSubmit}>
 						<Holder>
 							<Label>Title</Label>
-							<Input placeholder="Title" />
+							<Input placeholder="Title" {...register("title")} />
 							<Error>Error</Error>
 						</Holder>
 
 						<Holder>
 							<Label>Message</Label>
-							<InputArea placeholder="Message" />
+							<InputArea placeholder="Message" {...register("message")} />
 							<Error>Error</Error>
 						</Holder>
 

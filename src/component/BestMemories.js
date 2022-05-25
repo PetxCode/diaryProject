@@ -1,22 +1,32 @@
 import React from "react";
 import styled from "styled-components";
 import { AiTwotoneDelete } from "react-icons/ai";
+import { useDispatch, useSelector } from "react-redux";
+import { removeBestMemories } from "./GlobalState";
 
 const BestMemories = () => {
+	const memo = useSelector((state) => state.bestMemories);
+	const dispatch = useDispatch();
 	return (
 		<Container>
 			<Wrapper>
-				<Card>
-					<Image />
+				{memo?.map((props) => (
+					<Card key={props._id}>
+						<Image src={props.image} />
 
-					<TextHolder>
-						<Holder>
-							<Title>title</Title>
-							<Icon />
-						</Holder>
-						<Message>Message</Message>
-					</TextHolder>
-				</Card>
+						<TextHolder>
+							<Holder>
+								<Title>{props.title}</Title>
+								<Icon
+									onClick={() => {
+										dispatch(removeBestMemories(props._id));
+									}}
+								/>
+							</Holder>
+							<Message>{props.message}</Message>
+						</TextHolder>
+					</Card>
+				))}
 			</Wrapper>
 		</Container>
 	);
@@ -57,11 +67,13 @@ const Image = styled.img`
 	width: 100%;
 	height: 200px;
 	background-color: darkorange;
+	object-fit: cover;
 `;
 
 const Card = styled.div`
+	margin: 10px;
 	width: 300px;
-	height: 320px;
+	min-height: 320px;
 	box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;
 	border-radius: 10px 10px 0 0;
 	overflow: hidden;

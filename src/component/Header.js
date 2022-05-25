@@ -19,8 +19,10 @@ const Header = () => {
 
 					{userData ? (
 						<div>
-							<Nav to="/createMemories">Create</Nav>
+							<Nav to="/mainView">Main View</Nav>
 							<Nav to="/best">Best</Nav>
+
+							<Nav to="/createMemories">Create</Nav>
 						</div>
 					) : null}
 				</Navigation>
@@ -28,6 +30,7 @@ const Header = () => {
 				{userData ? (
 					<Navigation>
 						<Avatar src={userData?.avatar} />
+						<strong style={{ marginRight: "10px" }}>{userData.userName}</strong>
 						<Nav1
 							onClick={() => {
 								dispatch(signOut());
